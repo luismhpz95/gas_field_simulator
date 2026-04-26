@@ -3,7 +3,6 @@ import pandas as pd
 from src.interpolator import LinearInterpolator
 
 class Fluid:
-    """Propiedades del gas real según GERG-91 mod. (ГОСТ 30319.2-96)"""
     
     Pstd = 1.0       # presión estándar [atm]
     Tstd = 293.15    # temperatura estándar [K]
@@ -11,16 +10,16 @@ class Fluid:
 
     def __init__(self, M: float, rho_c: float, xa: float, xy: float, T: float):
         """
-        Parámetros
+        Параметры
         ----------
         M : float
-            Masa molar [kg/mol]
+            Молярная масса [кг/моль]
         rho_c : float
-            Densidad en condiciones estándar [kg/m³]
+            Плотность в стандартных условиях [кг/м³]
         xa : float
-            Fracción molar de N₂
+            Молярная доля N₂
         xy : float
-            Fracción molar de CO₂
+            Молярная доля CO₂
         """
         self.M = M
         self.rho_c = rho_c
@@ -145,7 +144,7 @@ class Fluid:
         float
             Объёмный коэффициент расширения Bg.
         """
-        # TODO: реализовать расчёт Bg через get_Z
+    
         Z = self.z(P)
         
         Bg = (self.Pstd * Z * self.T) / (P * self.Tstd)
