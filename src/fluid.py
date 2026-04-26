@@ -166,13 +166,9 @@ class Fluid:
         ----------
         float
             Вязкость газа Mu, сантипуаз (cP).
-    
-        Примечания
-        ----------
-        Использует линейную интерполяцию табличных данных из файла 'interp_data.csv',
-        содержащего столбцы 'pressure, atm' и 'viscosity, cP'.
+            
         """
-
+        
         df = pd.read_csv('interp_data.csv', sep=';')
 
         LI_viscosity = LinearInterpolator(df['pressure, atm'].tolist(),
