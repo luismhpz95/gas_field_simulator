@@ -4,10 +4,10 @@ from src.interpolator import LinearInterpolator
 
 class Fluid:
     
-    Pstd = 1.0       # presión estándar [atm]
-    Tstd = 293.15    # temperatura estándar [K]
-    R = 8.314        # constante universal [J/(mol·K)]
-
+    Pstd = 1.0       # стандартное давление [атм]
+    Tstd = 293.15    # стандартная температура [K]
+    R = 8.314        # универсальная газовая постоянная [Дж/(моль·К)]
+    
     def __init__(self, M: float, rho_c: float, xa: float, xy: float, T: float):
         """
         Параметры
