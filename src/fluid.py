@@ -1,26 +1,52 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
-
-# === Вставьте сюда свой класс Fluid из ДЗ-2 (с реализованными get_Z и get_Bg) ===
+from src.interpolator import LinearInterpolator
 
 class Fluid:
-    """Класс для расчёта свойств природного газа по методике GERG-91 мод."""
+    """Propiedades del gas real según GERG-91 mod. (ГОСТ 30319.2-96)"""
     
-    Pstd = 1       # стандартное давление, атм
-    Tstd = 293.15  # стандартная температура, К
-    
-    def __init__(self, rho_c: float, xa: float, xy: float):
+    Pstd = 1.0       # presión estándar [atm]
+    Tstd = 293.15    # temperatura estándar [K]
+    R = 8.314        # constante universal [J/(mol·K)]
+
+    def __init__(self, M: float, rho_c: float, xa: float, xy: float, T: float):
+        """
+        Parámetros
+        ----------
+        M : float
+            Masa molar [kg/mol]
+        rho_c : float
+            Densidad en condiciones estándar [kg/m³]
+        xa : float
+            Fracción molar de N₂
+        xy : float
+            Fracción molar de CO₂
+        """
+        self.M = M
         self.rho_c = rho_c
         self.xa = xa
         self.xy = xy
-    
-    def get_Z(self, P: float, T: float) -> float:
-        # TODO: скопируйте свою реализацию из ДЗ-2
-        ...
+        self.T = T
+
+    def z(self, P: float) -> float:
+        """
+        Рассчитать коэффициент сверхсжимаемости Z по методике GERG-91 мод.
+
+        Параметры
+        ----------
+        P : float
+            Давление, атм.
+        T : float
+            Температура, К.
+
+        Возвращает
+        ----------
+        float
+            Коэффициент сверхсжимаемости Z.
+        """
         xe = 1 -  self.xa -  self.xy    # xe = Xэ
 
-        B_as = 0.72 + 1.875e-5 * (320 - T)**2       #B_as = B*
+        B_as = 0.72 + 1.875e-5 * (320 - self.T)**2       #B_as = B*
 
         z_c = 1 - (0.0741 *  self.rho_c - 0.006 - 0.063 *  self.xa - 0.0575 *  self.xy)**2
 
@@ -28,34 +54,34 @@ class Fluid:
 
         H = 128.64 + 47.479 * Me
         
-        B1 = (-0.425468 + 2.865e-3 * T - 4.62073e-6 * T**2
-              + (8.77118e-4 - 5.56281e-6 * T + 8.8151e-9 * T**2) * H 
-              + (-8.24747e-7 + 4.31436e-9 * T - 6.08319e-12 * T**2) * H**2)
+        B1 = (-0.425468 + 2.865e-3 * self.T - 4.62073e-6 * self.T**2
+              + (8.77118e-4 - 5.56281e-6 * self.T + 8.8151e-9 * self.T**2) * H 
+              + (-8.24747e-7 + 4.31436e-9 * self.T - 6.08319e-12 * self.T**2) * H**2)
 
-        B2 = -0.1446 + 7.4091e-4 * T - 9.1195e-7 * T**2
+        B2 = -0.1446 + 7.4091e-4 * self.T - 9.1195e-7 * self.T**2
 
-        B23 = -0.339693 + 1.61176e-3 * T - 2.04429e-6 * T**2
+        B23 = -0.339693 + 1.61176e-3 * self.T - 2.04429e-6 * self.T**2
 
-        B3 = -0.86834 + 4.0376e-3 * T - 5.1657e-6 * T**2
+        B3 = -0.86834 + 4.0376e-3 * self.T - 5.1657e-6 * self.T**2
         
         Bm = (xe**2 * B1 + xe *  self.xa * B_as * (B1 + B2) 
               - 1.73 * xe *  self.xy * (B1 * B3)**0.5 
               +  self.xa**2 * B2 + 2 *  self.xa *  self.xy  * B23 
               +  self.xy**2 * B3)
 
-        C1 = (-0.302488 + 1.95861e-3 * T - 3.16302e-6 * T**2 
-              + (6.46422e-4 - 4.22876e-6 * T + 6.88157e-9 * T**2) * H 
-              + (-3.32805e-7 + 2.2316e-9 * T - 3.67713e-12 * T**2) * H**2)
+        C1 = (-0.302488 + 1.95861e-3 * self.T - 3.16302e-6 * self.T**2 
+              + (6.46422e-4 - 4.22876e-6 * self.T + 6.88157e-9 * self.T**2) * H 
+              + (-3.32805e-7 + 2.2316e-9 * self.T - 3.67713e-12 * self.T**2) * H**2)
         
-        C2 = 7.8498e-3 - 3.9895e-5 * T + 6.1187e-8 * T**2
+        C2 = 7.8498e-3 - 3.9895e-5 * self.T + 6.1187e-8 * self.T**2
 
-        C3 = 2.0513e-3 + 3.4888e-5 * T - 8.3703e-8 * T**2
+        C3 = 2.0513e-3 + 3.4888e-5 * self.T - 8.3703e-8 * self.T**2
 
-        C223 = 5.52066e-3 - 1.68609e-5 * T + 1.57169e-8 * T**2
+        C223 = 5.52066e-3 - 1.68609e-5 * self.T + 1.57169e-8 * self.T**2
 
-        C233 = 3.58783e-3 + 8.06674e-6 * T - 3.25798e-8 * T**2
+        C233 = 3.58783e-3 + 8.06674e-6 * self.T - 3.25798e-8 * self.T**2
 
-        C_as = 0.92 + 0.0013 * (T - 270)    # C_as = C*
+        C_as = 0.92 + 0.0013 * (self.T - 270)    # C_as = C*
         
         Cm = (xe**3 * C1 + 3 * xe**2 *  self.xa * C_as * (C1**2 * C2)**(1/3) 
               + 2.76 * xe**2 *  self.xy * (C1**2 * C3)**(1/3) 
@@ -67,7 +93,7 @@ class Fluid:
 
         P_MPa = P * 0.101325
         
-        b = 1000 * P_MPa / (2.7715 * T)
+        b = 1000 * P_MPa / (2.7715 * self.T)
         
         B0 = b * Bm
 
@@ -77,17 +103,81 @@ class Fluid:
 
         A1 = 1 + B0
         
-        A2 = np.cbrt((A0 - (A0**2 - A1**3)**0.5))  
+        A2 = np.cbrt((A0 - (A0**2 - A1**3)**0.5)) 
         
         Z = (1 + A2 + A1/A2) / 3
-        
+
         return Z
+
+    def ro(self, P: float) -> float:
+        """
+        Плотность газа [кг/м³] при давлении P.
+
+        Параметры
+        ---------
+        P : float
+            Давление [атм]
+
+        Возвращает
+        ----------
+        float
+            Плотность [кг/м³]
+        """
+        P_pa = P * 101325
+        Z = self.z(P)
+        Ro = (P_pa * self.M) / (Z * self.R * self.T)
+
+        return Ro
+
+    def bg(self, P: float) -> float:
+        """
+        Рассчитать объёмный коэффициент расширения газа Bg.
+
+        Bg = (Pstd * Z * T) / (P * Tstd)
+
+        Параметры
+        ----------
+        P : float
+            Давление, атм.
+            
+        Возвращает
+        ----------
+        float
+            Объёмный коэффициент расширения Bg.
+        """
+        # TODO: реализовать расчёт Bg через get_Z
+        Z = self.z(P)
         
-    def get_Bg(self, P: float, T: float) -> float:
-        # TODO: скопируйте свою реализацию из ДЗ-2
-        ...
-        Z = self.get_Z(P,T)
-        
-        Bg = (self.Pstd * Z * T) / (P * self.Tstd)
+        Bg = (self.Pstd * Z * self.T) / (P * self.Tstd)
 
         return Bg
+
+    def mu(self, P: float) -> float:
+        """
+        Рассчитать вязкость газа Mu при давлении P.
+
+        Mu = интерполяция по табличным данным зависимости вязкости от давления
+
+        Параметры
+        ----------
+        P : float
+            Давление, атм.
+        
+        Возвращает
+        ----------
+        float
+            Вязкость газа Mu, сантипуаз (cP).
+    
+        Примечания
+        ----------
+        Использует линейную интерполяцию табличных данных из файла 'interp_data.csv',
+        содержащего столбцы 'pressure, atm' и 'viscosity, cP'.
+        """
+
+        df = pd.read_csv('interp_data.csv', sep=';')
+
+        LI_viscosity = LinearInterpolator(df['pressure, atm'].tolist(),
+                                          df['viscosity, cP'].tolist())
+        Mu = LI_viscosity.predict(P)
+
+        return Mu
