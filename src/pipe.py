@@ -65,7 +65,7 @@ class Pipe:
             name = f"Pipe(L={self.L}, D={self.D})",
             P_in = P_in,
             P_out = P_out,
-            dP = deltaP,
+            dP = dP,
             q_std = q,
             q_res = q * bg,
             v = v,
