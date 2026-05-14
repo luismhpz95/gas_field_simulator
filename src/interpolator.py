@@ -4,22 +4,19 @@ class LinearInterpolator:
     
     Параметры
     ----------
-    xs : list
+    x : list
         Узловые точки (отсортированы по возрастанию).
-    ys : list
+    y : list
         Значения функции в узловых точках.
     """
     
-    def __init__(self, xs, ys):
-        if len(xs) != len(ys):
-            raise ValueError("Ошибка: xs и ys должны иметь одинаковую длину")
-        
-        for i in range(1, len(xs)):
-            if xs[i] <= xs[i-1]:
-                raise ValueError("Ошибка: xs должен быть отсортирован по возрастанию")
-        
-        self.xs = xs
-        self.ys = ys
+    def __init__(self, x, y):
+
+        self.x = x
+        self.y = y
+
+        if len(self.x) != len(self.y):
+            raise ValueError("Ошибка: x и y должны иметь одинаковую длину")
     
     def predict(self, xp):
         """
@@ -35,12 +32,14 @@ class LinearInterpolator:
         float
             Интерполированное значение yp.
         """
-        if xp < self.xs[0] or xp > self.xs[-1]:
-            raise ValueError(f"xp={xp} вне диапазона [{self.xs[0]}, {self.xs[-1]}]")
+
+        if xp < self.x[0] or xp > self.x[-1]:
+            raise ValueError(f"xp={xp} выходит за границы диапазона ")
         
-        for i in range(len(self.xs) - 1):
-            if self.xs[i] <= xp <= self.xs[i+1]:
-                yp = self.ys[i] + (self.ys[i+1] - self.ys[i]) / (self.xs[i+1] - self.xs[i]) * (xp - self.xs[i])
-                return yp
-        
-        raise ValueError("Не удалось найти интервал для интерполяции")
+        else:
+            for i in range(len(self.x) - 1):
+                if self.x[i] <= xp <= self.x[i+1]:
+                    yp = (self.y[i]+ (self.y[i+1] - self.y[i])/(self.x[i+1] 
+                         - self.x[i]) * (xp - self.x[i]))
+                
+                    return yp
