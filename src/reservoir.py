@@ -1,4 +1,5 @@
 from src.fluid import Fluid
+from dataclasses import dataclass
 
 @dataclass
 class ResProps:
