@@ -121,5 +121,5 @@ class Fluid:
         Mu = интерполяция по табличным данным зависимости вязкости от давления
             
         """
-        Mu = LI_viscosity.predict(P)
+        Mu = self.LI_viscosity.predict(P)
         return Mu
