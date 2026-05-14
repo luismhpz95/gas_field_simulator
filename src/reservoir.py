@@ -1,11 +1,13 @@
-from dataclasses import dataclass
+from src.fluid import Fluid
 
 @dataclass
 class ResProps:
-    """Свойства пласта (текущее состояние)"""
-    P: float   # давление [атм]
-    V: float   # объем [м³]
-    T: float   # температура [К]
+    """
+    Свойства пласта (текущее состояние)
+    """
+    P: float    # давление [атм]
+    V: float    # объем [м³]
+    T: float    # температура [К]
 
 
 class Reservoir:
@@ -15,8 +17,9 @@ class Reservoir:
     
     Pstd = 1.0       # стандартное давление [атм]
     Tstd = 293.15    # стандартная температура [К]
-    
-    def __init__(self, resprops: ResProps, fluid):
+    Z_std = 1
+
+    def __init__(self, resprops: ResProps, fluid: Fluid):
         """
         Начальное состояние пласта (P [атм], V [м³], T [К])
         """
@@ -27,7 +30,7 @@ class Reservoir:
         # Расчет плотности в стандартных условиях
         
         P_Pa = self.Pstd * 101325
-        self.ro_std = (P_Pa  * fluid.M) / (fluid.R * self.Tstd)
+        self.ro_std = (P_Pa  * fluid.M) / (self.Z_std * fluid.R * self.Tstd)
     
     def p2(self, q_total: float, dt: float = 1.0) -> float:
         """
@@ -49,6 +52,6 @@ class Reservoir:
         Z = self.fluid.z(P_res)
         
         # Формула материального баланса согласно разделу 2.3:
-        P2 = P_res - (Z * P_res * self.ro_std / ro_res) * (q_total / V_res) * dt
+        P2 = P_res - (Z * self.ro_std / ro_res) * (q_total / V_res) * dt
         
         return P2
