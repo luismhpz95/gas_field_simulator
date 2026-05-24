@@ -61,7 +61,7 @@ class FieldSimulator:
         for i, (well, q) in enumerate(zip(self.wells, [q1, q2, q3])):
             if well.pipe is not None:
                 result_nkt = well.pipe.dp(P_man, q)
-                result_nkt.name = f'well_{i+1}'  # ← solo cambias el nombre
+                result_nkt.name = f'well_{i+1}'
                 states[f'well_{i+1}'] = result_nkt
             else:
                 states[f'well_{i+1}'] = NodeState(
