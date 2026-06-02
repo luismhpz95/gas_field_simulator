@@ -60,7 +60,15 @@ class FieldSimulator:
         # Состояния скважин
         for i, (well, q) in enumerate(zip(self.wells, [q1, q2, q3])):
             if well.pipe is not None:
-                result_nkt = well.pipe.dp(P_man, q)
+                P_bhp = P_man
+                for _ in range(10):
+                    result_nkt = well.pipe.dp(P_bhp, q)
+                    P_bhp_new = P_man + result_nkt.dP
+                    if abs(P_bhp_new - P_bhp) < 1e-6:
+                         break
+                    P_bhp = P_bhp_new
+                
+                result_nkt = well.pipe.dp(P_bhp, q)
                 result_nkt.name = f'well_{i+1}'
                 states[f'well_{i+1}'] = result_nkt
             else:
@@ -96,8 +104,13 @@ class FieldSimulator:
         well = self.wells[well_idx]
         
         if well.pipe is not None:
-            result_nkt = well.pipe.dp(P_man, q)
-            P_bhp = P_man + result_nkt.P_out
+            P_bhp = P_man
+            for _ in range(10):
+                result_nkt = well.pipe.dp(P_bhp, q)
+                P_bhp_new = P_man + result_nkt.dP
+                if abs(P_bhp_new - P_bhp) < 1e-6:
+                    break
+                P_bhp = P_bhp_new
         else:
             P_bhp = P_man
         
