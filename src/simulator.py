@@ -158,7 +158,7 @@ class FieldSimulator:
             P_res = P_res_new
             
             if day % 10 == 0 or day == 1:
-                print(f"День {day:3d} | P_res = {P_res:6.2f} атм | q_total = {q_total:6.2f} м³ст/сут | Gp = {Gp:.1f} тыс. м³")
+                print(f"День {day:3d} | P_res = {P_res:6.2f} атм | q_total = {q_total:6.2f} ст.м³/сут | Gp = {Gp:.1f} тыс. м³")
         
         print("=" * 60)
         print(f"СИМУЛЯЦИЯ ЗАВЕРШЕНА. Дней: {N_days}")
