@@ -27,7 +27,7 @@ class Fluid:
         self.T = T
 
         df = pd.read_csv('interp_data.csv', sep=';')
-        LI_viscosity = LinearInterpolator(df['pressure, atm'].tolist(),
+        self.LI_viscosity = LinearInterpolator(df['pressure, atm'].tolist(),
                                           df['viscosity, cP'].tolist())
     def z(self, P: float) -> float:
         """
@@ -97,6 +97,14 @@ class Fluid:
     def ro(self, P: float) -> float:
         """
         Плотность газа [кг/м³] при давлении P.
+        Параметры
+        ---------
+        P : float
+            Давление [атм]
+        Возвращает
+        ----------
+        float
+            Плотность [кг/м³]
         """
         P_Pa = P*101325
         Z = self.z(P)
@@ -107,7 +115,15 @@ class Fluid:
         """
         Рассчитать объёмный коэффициент расширения газа Bg.
         Bg = (Pstd * Z * T) / (P * Tstd)
-
+        Параметры
+        ----------
+        P : float
+            Давление, атм.
+            
+        Возвращает
+        ----------
+        float
+            Объёмный коэффициент расширения Bg.
         """
     
         Z = self.z(P)
@@ -119,7 +135,16 @@ class Fluid:
         """
         Рассчитать вязкость газа Mu при давлении P.
         Mu = интерполяция по табличным данным зависимости вязкости от давления
+        Параметры
+        ----------
+        P : float
+            Давление, атм.
+        
+        Возвращает
+        ----------
+        float
+            Вязкость газа Mu, сантипуаз (cP).
             
         """
-        Mu = self.LI_viscosity.predict(P)
-        return Mu
+
+        return self.LI_viscosity.predict(P)
