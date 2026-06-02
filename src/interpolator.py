@@ -33,13 +33,16 @@ class LinearInterpolator:
             Интерполированное значение yp.
         """
 
-        if xp < self.x[0] or xp > self.x[-1]:
-            raise ValueError(f"xp={xp} выходит за границы диапазона ")
-        
-        else:
-            for i in range(len(self.x) - 1):
-                if self.x[i] <= xp <= self.x[i+1]:
-                    yp = (self.y[i]+ (self.y[i+1] - self.y[i])/(self.x[i+1] 
-                         - self.x[i]) * (xp - self.x[i]))
-                
-                    return yp
+        if xp < self.x[0]:
+            return self.y[0]
+        if xp > self.x[-1]:
+            return self.y[-1]
+
+        for i in range(len(self.x) - 1):
+            if self.x[i] <= xp <= self.x[i+1]:
+                yp = (self.y[i] + (self.y[i+1] - self.y[i]) /
+                    (self.x[i+1] - self.x[i]) * (xp - self.x[i]))
+                return yp
+
+        raise ValueError("Не удалось найти интервал для интерполяции")
+
