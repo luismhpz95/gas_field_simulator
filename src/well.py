@@ -4,7 +4,7 @@ from src.pipe import Pipe
 
 class Well:
   
-    beta = 0.00852702
+    beta = 0.000852702
     
     def __init__(self, fluid: Fluid, k: float, h: float, re: float, rw: float, pipe: Pipe = None):
 
@@ -28,6 +28,6 @@ class Well:
             return 0.0
         
         C = self.productivity_coef(P_res, P_bhp)
-        q_std = C * (P_res - P_bhp)
+        q_std = C * (P_res - P_bhp) / self.fluid.bg(P_res)
         return q_std
 
