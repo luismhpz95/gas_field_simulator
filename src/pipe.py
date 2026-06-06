@@ -16,21 +16,21 @@ class Pipe:
     
     def f_lambda(self, Re: float):
        # Коэффициент гидравлического сопротивления λ
-       if Re <= 0:
+        if Re <= 0:
            return 0.0
        
        # Ламинарный: λ = 64/Re
-       if Re < 2300:
+        if Re < 2300:
           return 64/Re
        
        # Турбулентный: уравнение Колбрука–Уайта
-       lambda_0 = 0.02
-       for _ in range(1000):
-           lambda_new = (-2 * np.log10(self.roughness/(3.7*self.D)
+        lambda_0 = 0.02
+        for _ in range(1000):
+            lambda_new = (-2 * np.log10(self.roughness/(3.7*self.D)
                                        + 2.51/(Re*np.sqrt(lambda_0)))) ** -2
 
             if abs(lambda_new - lambda_0) <= 1e-6:
-               return lambda_new
+                return lambda_new
 
             lambda_0 = lambda_new
         return lambda_new   
