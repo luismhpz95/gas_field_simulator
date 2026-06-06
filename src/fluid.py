@@ -22,8 +22,8 @@ class Fluid:
         """
         self.M = M
         self.rho_c = rho_c
-        self.xa = xa
-        self.xy = xy
+        self.xa = xa / 100
+        self.xy = xy / 100
         self.T = T
 
         df = pd.read_csv('interp_data.csv', sep=';')
@@ -86,10 +86,7 @@ class Fluid:
         
         A0 = 1 + 1.5 * (B0 + C0)
         A1 = 1 + B0
-
-        discriminant = A0**2 - A1**3
-        discriminant = max(discriminant, 0.0)
-        A2 = np.cbrt(A0 - discriminant**0.5)
+        A2 = np.cbrt(A0 - (A0**2 - A1**3)**0.5)
         
         Z = (1 + A2 + A1/A2) / 3
         return Z
